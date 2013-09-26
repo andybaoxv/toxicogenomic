@@ -1,11 +1,12 @@
 import csv
 import numpy as np
-import matplotlib.pyplot as plt
+import pickle
 
 # Load data from the dataset file
 file_dataset = open("12 DBPs and other chemicals.csv","rb")
 reader = csv.reader(file_dataset)
 lines = [line for line in reader]
+file_dataset.close()
 
 mtr_dataset = np.array(lines)
 
@@ -16,7 +17,7 @@ n_genes = 39
 # Number of time points in collecting Gene expression data
 n_times = 25
 assert mtr_dataset.shape[0]%(n_genes+1) == 0
-assert (mtr_dataset.shape[1]-1)%(n_times+1) == 0
+assert (mtr_dataset.shape[1]-6)%(n_times+1) == 0
 
 # Number of toxicants used
 n_toxicants = mtr_dataset.shape[0]/(n_genes+1)
@@ -24,28 +25,42 @@ n_toxicants = mtr_dataset.shape[0]/(n_genes+1)
 # Number of dose concentration values used
 n_concentrations = (mtr_dataset.shape[1]-1)/(n_times+1)
 
-"""
-# Choose dataset
-for index_toxicants in range(n_toxicants):
+# Construct a 4-dim array to store the dataset
+# dim 1--> toxicants; dim 2--> concentrations; dim 3--> genes; dim 4-->times;
+data = np.zeros((n_toxicants,n_concentrations,n_genes,n_times))
+
+# Extract data from the original dataset
+# Specifically to this dataset "12 DBPs and other chemicals.csv"
+# Toxicants 0-10 and 16-20 have the same delimiter(taking one cell)
+# Toxicants 11-16 have the same delimiter(taking two cells)
+for index_toxicants in list(set(range(n_toxicants))-set(range(11,16))):
     for index_concentrations in range(n_concentrations):
-        tmp_1 = (n_genes+1)*index_toxicants
-        tmp_2 = (n_times+2)*index_concentrations
-        data_tmp = mtr_dataset[tmp_1+1:tmp_1+1+n_genes,tmp_2+2:tmp_2+2+n_times]
-        
-        data = np.zeros((n_genes,n_times))
         for i in range(n_genes):
             for j in range(n_times):
-                data[i,j] = float(data_tmp[i,j])
+                data[index_toxicants,index_concentrations,i,j] = float(\
+                        mtr_dataset[1+index_toxicants*(n_genes+1)+i,\
+                        2+index_concentrations*(n_times+1)+j])
 
-        # Minus the DC level
+for index_toxicants in range(11,16):
+    for index_concentrations in range(n_concentrations):
         for i in range(n_genes):
-            data[i,:] = data[i,:]-np.mean(data[i,:])
-        
-        # Draw the plot
-        fig = plt.figure()
+            for j in range(n_times):
+                data[index_toxicants,index_concentrations,i,j] = float(\
+                        mtr_dataset[1+index_toxicants*(n_genes+1)+i,\
+                        2+index_concentrations*(n_times+2)+j])
 
-        for i in range(n_genes):
-            plt.plot(range(n_times),data[i,:])
+# Extract Gene and pathway information
+# genes_name contains 39 names of different genes
+# pathways_type contains corresponding pathway type for the genes
+genes_name = []
+pathways_type = []
+for i in range(1,1+n_genes):
+    genes_name.append(mtr_dataset[i,1])
+    if mtr_dataset[i,0] != '':
+        pathways_type.append(mtr_dataset[i,0])
+    else:
+        pathways_type.append(pathways_type[-1])
 
-plt.show()
-"""
+file_dataset = open("dataset_12dbps.pkl","wb")
+pickle.dump([data,genes_name,pathways_type],file_dataset)
+file_dataset.close()
