@@ -6,10 +6,11 @@ from nitime import algorithms as alg
 from nitime.timeseries import TimeSeries
 from nitime.viz import plot_tseries
 
-from sklearn.decomposition import PCA
-from sklearn.cluster import KMeans
-from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+from scipy.cluster.hierarchy import dendrogram
+from my_hierarchical_clustering import my_hierarchical_clustering
+from sklearn.metrics.pairwise import euclidean_distances
+import copy
 
 # Read dataset and related information
 file_dataset = open("dataset_12dbps.pkl","rb")
@@ -21,7 +22,7 @@ n_toxicants,n_concentrations,n_genes,n_times = data.shape
 
 #########################################################################
 # Specify the order of autoregressive model
-n_ar_order = 5
+n_ar_order = 3
 # Specify the number of clusters of conditions 
 n_clusters = 4
 # Apply PCA(True) or not(False)
@@ -51,29 +52,20 @@ print("AR order: "+str(n_ar_order)+"\tNoise level: "+str(sigma_est_avg))
 # n_instances = n_conditions, n_features = n_coefs
 n_instances,n_features = mtr_coef.shape
 
-# Apply PCA on the matrix of coeficient dataset
-if flag_pca == True:
-    clf_pca = PCA(n_components=3,copy=True,whiten=False)
-    mtr_coef = clf_pca.fit_transform(mtr_coef)
+# Obtain distance matrix
+mtr_dis = euclidean_distances(mtr_coef,mtr_coef)
+mtr_sim = np.max(mtr_dis)-mtr_dis
+mtr_lin = my_hierarchical_clustering(mtr_sim,method='complete')
 
-# Apply K-means clustering on the dataset
-clf_kmeans = KMeans(n_clusters=n_clusters,init='random',n_jobs=-1)
-labels = clf_kmeans.fit_predict(mtr_coef)
-
-# Visualize the clustering result in 3D
-clf_pca_1 = PCA(n_components=visual_dim,copy=True,whiten=False)
-mtr_coef_ld = clf_pca_1.fit_transform(mtr_coef)
-fig = plt.figure()
-color = ['g','y','r','k','y','k','c','w']
-
-if visual_dim == 3:
-    ax = fig.add_subplot(111,projection='3d')
-    for i in range(n_instances):
-        ax.scatter(mtr_coef_ld[i,0],mtr_coef_ld[i,1],mtr_coef_ld[i,2],\
-                c=color[labels[i]])
-elif visual_dim == 2:
-    for i in range(n_instances):
-        plt.scatter(mtr_coef_ld[i,0],mtr_coef_ld[i,1],c=color[labels[i]])
-else:
-    print "ERROR: visual_dim must be 2 or 3"
-plt.show()
+# Draw dendrogram of hierarchical clustering
+fig = plt.figure(figsize=(30,30))
+labels = []
+for i in range(n_conditions):
+    index_toxicants = i/n_concentrations
+    index_concentrations = i%n_concentrations
+    labels.append(toxicants_name[index_toxicants]+"_con_"+str(index_concentrations))
+tmp = copy.deepcopy(mtr_lin)
+for i in range(tmp.shape[0]):
+    tmp[i,2] = np.max(mtr_dis)-tmp[i,2]
+dend = dendrogram(tmp,labels=labels)
+plt.savefig('dendrogram_hierarchical.png')

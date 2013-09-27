@@ -61,6 +61,14 @@ for i in range(1,1+n_genes):
     else:
         pathways_type.append(pathways_type[-1])
 
+# Extract Toxicants information
+toxicants_name = range(n_toxicants)
+for i in range(n_toxicants):
+    if i in range(0,7)+range(8,11):
+        toxicants_name[i] = mtr_dataset[i*(n_genes+1),2]
+    else:
+        toxicants_name[i] = mtr_dataset[i*(n_genes+1),0]
+
 file_dataset = open("dataset_12dbps.pkl","wb")
-pickle.dump([data,genes_name,pathways_type],file_dataset)
+pickle.dump([data,genes_name,pathways_type,toxicants_name],file_dataset)
 file_dataset.close()
