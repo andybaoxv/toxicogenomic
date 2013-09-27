@@ -23,3 +23,5 @@ order value to be 5(must be positive integer) and the linkage method to be
 'complete'(other choices are 'single', 'average'). To explore the differences
 between these methods, please refer to the following link:
 http://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.linkage.html
+
+A sample output is "dendrogram_hierarchical.png"
