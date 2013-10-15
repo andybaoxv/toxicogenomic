@@ -3,7 +3,7 @@ import numpy as np
 import pickle
 
 # Load data from the dataset file
-file_dataset = open("12 DBPs and other chemicals.csv","rb")
+file_dataset = open("/home/changyale/dataset/toxicogenomic/12_DBPs_and_other_chemicals.csv","rb")
 reader = csv.reader(file_dataset)
 lines = [line for line in reader]
 file_dataset.close()
