@@ -88,6 +88,6 @@ for i in range(n_conditions):
 tmp = copy.deepcopy(mtr_lin)
 for i in range(tmp.shape[0]):
     tmp[i,2] = np.max(mtr_dis)-tmp[i,2]
-dend = dendrogram(tmp,labels=labels)
+dend = dendrogram(tmp,labels=labels,orientation='right')
 plt.savefig('dendrogram_hierarchical.png')
 print("The result is stored in dendrogram_hierarchical.png")
