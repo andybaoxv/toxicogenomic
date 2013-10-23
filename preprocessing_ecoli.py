@@ -4,11 +4,13 @@ pickle file
 import csv
 import numpy as np
 import pickle
-from python.toxicogenomic.utils.is_number import is_number
+#from python.toxicogenomic.utils.is_number import is_number
+from is_number import is_number
 
 # Load data from the dataset file
-file_dataset = open("/home/changyale/dataset/toxicogenomic/"+\
-        "EcoliData_3Dataset_WithoutMovAvg.csv","rb")
+#file_dataset = open("/home/changyale/dataset/toxicogenomic/"+\
+#        "EcoliData_3Dataset_WithoutMovAvg.csv","rb")
+file_dataset = open("EcoliData_3Dataset_WithoutMovAvg.csv","rb")
 reader = csv.reader(file_dataset)
 lines = [line for line in reader]
 file_dataset.close()
