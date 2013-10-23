@@ -34,9 +34,13 @@ data = np.zeros((n_conditions,n_genes,n_times))
 for i in range(n_conditions):
     for j in range(n_genes):
         for k in range(n_times):
-            if is_number(mtr_dataset[i,1+j*n_times+k]) == False:
-                print([i,1+j*n_times+k,mtr_dataset[i,1+j*n_times+k]])
-            #data[i,j,k] = float(mtr_dataset[i,1+j*n_times+k])
+            if is_number(mtr_dataset[i,1+j*n_times+k]) == True:
+                data[i,j,k] = float(mtr_dataset[i,1+j*n_times+k])
+            else:
+                data[i,j,k] = -11.51292546
     conditions_name.append(mtr_dataset[i,0])
 
+file_dataset = open("EcoliData_3Dataset_WithoutMovAvg.pkl","wb")
+pickle.dump([data,conditions_name],file_dataset)
+file_dataset.close()
 
