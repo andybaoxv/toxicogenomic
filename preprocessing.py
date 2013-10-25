@@ -72,3 +72,12 @@ for i in range(n_toxicants):
 file_dataset = open("dataset_12dbps.pkl","wb")
 pickle.dump([data,genes_name,pathways_type,toxicants_name],file_dataset)
 file_dataset.close()
+
+# write a copy in csv file
+file_data = open("data_12dbps.csv","wb")
+file_writer = csv.writer(file_data)
+for i in range(data.shape[0]):
+    for j in range(data.shape[1]):
+        for k in range(data.shape[2]):
+            file_writer.writerow(list(data[i,j,k,:]))
+file_data.close()
